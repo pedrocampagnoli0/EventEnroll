@@ -2,7 +2,7 @@ global using EventEnroll.Models;
 global using EventEnroll.Services.EventService;
 global using EventEnroll.Dtos.Event;
 global using AutoMapper;
-
+global using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 

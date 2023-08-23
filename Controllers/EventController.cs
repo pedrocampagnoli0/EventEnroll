@@ -35,5 +35,25 @@ namespace EventEnroll.Controllers
         {
             return Ok(await _eventService.AddEvent(newEvent));
         }
+        [HttpPut]
+        public async Task<ActionResult<ServiceResponse<List<GetEventDto>>>> UpdateEvent(UpdateEventDto updatedEvent)
+        {
+            var response = await _eventService.UpdateEvent(updatedEvent);
+            if(response.Data is null)
+            {
+                return NotFound(response);
+            }
+            return Ok();
+        }
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<ServiceResponse<GetEventDto>>> DeleteEvent(int id)
+        {
+            var response = await _eventService.DeleteEvent(id);
+            if (response.Data is null)
+            {
+                return NotFound(response);
+            }
+            return Ok();
+        }
     }
 }

@@ -6,6 +6,7 @@
         {
             CreateMap<Event, GetEventDto>();
             CreateMap<AddEventDto, Event>();
+            CreateMap<UpdateEventDto, Event>();
         }
     }
 }

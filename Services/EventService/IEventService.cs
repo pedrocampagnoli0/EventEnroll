@@ -8,5 +8,7 @@ namespace EventEnroll.Services.EventService
         Task<ServiceResponse<List<GetEventDto>>> GetAllEvents();
         Task<ServiceResponse<GetEventDto>> GetEventById(int id);
         Task<ServiceResponse<List<GetEventDto>>> AddEvent(AddEventDto newEvent);
+        Task<ServiceResponse<GetEventDto>> UpdateEvent(UpdateEventDto updatedEvent);
+        Task<ServiceResponse<List<GetEventDto>>> DeleteEvent(int id);
     }
 }
