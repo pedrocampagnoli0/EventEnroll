@@ -19,19 +19,19 @@ namespace EventEnroll.Controllers
         }
 
         [HttpGet("GetAll")]
-        public async Task<ActionResult<ServiceResponse<List<Event>>>> Get()
+        public async Task<ActionResult<ServiceResponse<List<GetEventDto>>>> Get()
         {
             return Ok(await _eventService.GetAllEvents());
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ServiceResponse<Event>>> GetSingle(int id)
+        public async Task<ActionResult<ServiceResponse<GetEventDto>>> GetSingle(int id)
         {
             return Ok(await _eventService.GetEventById(id));
         }
 
         [HttpPost]
-        public async Task<ActionResult<ServiceResponse<List<Event>>>> AddEvent(Event newEvent)
+        public async Task<ActionResult<ServiceResponse<List<GetEventDto>>>> AddEvent(AddEventDto newEvent)
         {
             return Ok(await _eventService.AddEvent(newEvent));
         }

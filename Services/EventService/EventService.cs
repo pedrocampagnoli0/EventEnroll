@@ -13,24 +13,31 @@ namespace EventEnroll.Services.EventService
             new Event(),
             new Event{ Id = 1, Title = "Pedro's birthday", Date = DateTime.Now}
         };
-        public async Task<ServiceResponse<List<Event>>> AddEvent(Event newEvent)
+        private readonly IMapper _mapper;
+        public EventService(IMapper mapper)
         {
-            var serviceResponse = new ServiceResponse<List<Event>>();
-            events.Add(newEvent);
-            serviceResponse.Data = events;
+            _mapper = mapper;
+        }
+        public async Task<ServiceResponse<List<GetEventDto>>> AddEvent(AddEventDto newEvent)
+        {
+            var serviceResponse = new ServiceResponse<List<GetEventDto>>();
+            var eventVar = _mapper.Map<Event>(newEvent);
+            eventVar.Id = events.Max(c => c.Id) + 1;
+            events.Add(_mapper.Map<Event>(newEvent));
+            serviceResponse.Data = events.Select(c => _mapper.Map<GetEventDto>(c)).ToList();
             return serviceResponse;
         }
-        public async Task<ServiceResponse<List<Event>>> GetAllEvents()
+        public async Task<ServiceResponse<List<GetEventDto>>> GetAllEvents()
         {
-            var serviceResponse = new ServiceResponse<List<Event>>();
-            serviceResponse.Data = events;
+            var serviceResponse = new ServiceResponse<List<GetEventDto>>();
+            serviceResponse.Data = events.Select(c => _mapper.Map<GetEventDto>(c)).ToList();
             return serviceResponse;
         }
-        public async Task<ServiceResponse<Event>> GetEventById(int id)
+        public async Task<ServiceResponse<GetEventDto>> GetEventById(int id)
         {
-            var serviceResponse = new ServiceResponse<Event>();
+            var serviceResponse = new ServiceResponse<GetEventDto>();
             var eventVar = events.FirstOrDefault(c => c.Id == id);
-            serviceResponse.Data = eventVar;
+            serviceResponse.Data = _mapper.Map<GetEventDto>(eventVar);
             return serviceResponse;
         }
     }
