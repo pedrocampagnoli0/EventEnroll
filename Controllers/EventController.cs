@@ -29,7 +29,7 @@ namespace EventEnroll.Controllers
         {            
             return Ok(await _eventService.GetAllEvents());
         }
-        [AllowAnonymous]
+
         [HttpGet("{id}")]
         public async Task<ActionResult<ServiceResponse<GetEventDto>>> GetSingle(int id)
         {
@@ -59,7 +59,7 @@ namespace EventEnroll.Controllers
             {
                 return NotFound(response);
             }
-            return Ok();
+            return Ok(response);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using EventEnroll.Models;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace EventEnroll.Dtos.Event
 {
@@ -10,8 +11,10 @@ namespace EventEnroll.Dtos.Event
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public DateTime Date { get; set; }
+        [JsonIgnore]
         public string? CreatorId { get; set; }
-        public ApplicationUser? Creator { get; set; }
-        public ICollection<ApplicationUser>? Attendees { get; set; } = new List<ApplicationUser>();
+        [Required]
+        public List<string> Attendees { get; set; } = new List<string>();
+
     }
 }

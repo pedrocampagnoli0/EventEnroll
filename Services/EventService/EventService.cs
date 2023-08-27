@@ -27,12 +27,17 @@ namespace EventEnroll.Services.EventService
         {
             var serviceResponse = new ServiceResponse<List<GetEventDto>>();
             var eventVar = _mapper.Map<Event>(newEvent);
+            eventVar.CreatorId = GetUserId();
+            //attaches the attendees to the event, and relates the names to the database list of users
+
 
             _context.Events.Add(eventVar);
             await _context.SaveChangesAsync();
 
             serviceResponse.Data = 
-                await _context.Events.Select(c => _mapper.Map<GetEventDto>(c)).ToListAsync();
+                await _context.Events
+                .Where(c => c.CreatorId == GetUserId())
+                .Select(c => _mapper.Map<GetEventDto>(c)).ToListAsync();
             return serviceResponse;
         }
 
@@ -41,7 +46,8 @@ namespace EventEnroll.Services.EventService
             var serviceResponse = new ServiceResponse<List<GetEventDto>>();
             try
             {
-                var eventVar = await _context.Events.FirstOrDefaultAsync(c => c.EventId == id);
+                var eventVar = await _context.Events
+                    .FirstOrDefaultAsync(c => c.EventId == id && c.CreatorId! == GetUserId());
                 if (eventVar is null)
                     throw new Exception($"Event with Id '{id}' not found.");
 
@@ -49,7 +55,10 @@ namespace EventEnroll.Services.EventService
 
                 await _context.SaveChangesAsync();
 
-                serviceResponse.Data = await _context.Events.Select(c => _mapper.Map<GetEventDto>(c)).ToListAsync(); 
+                serviceResponse.Data = 
+                    await _context.Events
+                    .Where(c => c.CreatorId! == GetUserId())
+                    .Select(c => _mapper.Map<GetEventDto>(c)).ToListAsync(); 
             }
             catch (Exception ex)
             {
@@ -70,7 +79,8 @@ namespace EventEnroll.Services.EventService
         public async Task<ServiceResponse<GetEventDto>> GetEventById(int id)
         {
             var serviceResponse = new ServiceResponse<GetEventDto>();
-            var dbEvent = await _context.Events.FirstOrDefaultAsync(c => c.EventId == id);
+            var dbEvent = await _context.Events
+                .FirstOrDefaultAsync(c => c.EventId == id && c.CreatorId! == GetUserId());
             serviceResponse.Data = _mapper.Map<GetEventDto>(dbEvent);
             return serviceResponse;
         }
@@ -81,8 +91,10 @@ namespace EventEnroll.Services.EventService
             var serviceResponse = new ServiceResponse<GetEventDto>();
             try
             {
-                var eventVar = await _context.Events.FirstOrDefaultAsync(c => c.EventId == updatedEvent.EventId);
-                if (eventVar is null)
+                var eventVar = await _context.Events
+                    .Include(c => c.Creator)
+                    .FirstOrDefaultAsync(c => c.EventId == updatedEvent.EventId);
+                if (eventVar is null || eventVar.CreatorId != GetUserId())
                     throw new Exception($"Event with Id '{updatedEvent.EventId}' not found.");
 
                 _mapper.Map(updatedEvent, eventVar);
@@ -90,9 +102,9 @@ namespace EventEnroll.Services.EventService
                 eventVar.Title = updatedEvent.Title;
                 eventVar.Description = updatedEvent.Description;
                 eventVar.Date = updatedEvent.Date;
-                eventVar.Attendees = updatedEvent.Attendees;
                 eventVar.CreatorId = updatedEvent.CreatorId;
                 eventVar.Creator = updatedEvent.Creator;
+                eventVar.Attendees = updatedEvent.Attendees;
 
                 await _context.SaveChangesAsync();
                 serviceResponse.Data = _mapper.Map<GetEventDto>(eventVar);
