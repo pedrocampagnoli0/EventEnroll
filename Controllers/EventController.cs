@@ -4,10 +4,14 @@ using EventEnroll.Models;
 using EventEnroll.Services.EventService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using EventEnroll.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace EventEnroll.Controllers
 {
-    [Authorize]
+
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [ApiController]
     [Route("api/[controller]")]
     public class EventController : ControllerBase
@@ -19,13 +23,13 @@ namespace EventEnroll.Controllers
         {
             _eventService = eventService;
         }
-        
+
         [HttpGet("GetAll")]
         public async Task<ActionResult<ServiceResponse<List<GetEventDto>>>> Get()
-        {
+        {            
             return Ok(await _eventService.GetAllEvents());
         }
-
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<ServiceResponse<GetEventDto>>> GetSingle(int id)
         {

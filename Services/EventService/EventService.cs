@@ -1,26 +1,28 @@
 ﻿using EventEnroll.Data;
 using EventEnroll.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace EventEnroll.Services.EventService
 {
     public class EventService : IEventService
     {
-        private static List<Event> events = new List<Event> {
-            new Event(),
-            new Event{ EventId = 1, Title = "Pedro's birthday", Date = DateTime.Now}
-        };
         private readonly IMapper _mapper;
         private readonly DataContext _context;
-        public EventService(IMapper mapper, DataContext context)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public EventService(IMapper mapper,IHttpContextAccessor httpContextAccessor, DataContext context)
         {
             _context = context;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
+
+        private string GetUserId() => _httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         public async Task<ServiceResponse<List<GetEventDto>>> AddEvent(AddEventDto newEvent)
         {
             var serviceResponse = new ServiceResponse<List<GetEventDto>>();
@@ -61,7 +63,7 @@ namespace EventEnroll.Services.EventService
         public async Task<ServiceResponse<List<GetEventDto>>> GetAllEvents()
         {
             var serviceResponse = new ServiceResponse<List<GetEventDto>>();
-            var dbEvents = await _context.Events.ToListAsync();
+            var dbEvents = await _context.Events.Where(c => c.CreatorId == GetUserId()).ToListAsync();
             serviceResponse.Data = dbEvents.Select(c => _mapper.Map<GetEventDto>(c)).ToList();
             return serviceResponse;
         }

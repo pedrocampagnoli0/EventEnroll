@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace EventEnroll.Dtos.Event
+namespace EventEnroll.Dtos.Auth
 {
-    public class AddUserDto
+    public class RegisterUserDto
     {
         public string? UserName { get; set; }
 
