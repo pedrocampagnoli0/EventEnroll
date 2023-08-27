@@ -1,4 +1,5 @@
-﻿using EventEnroll.Models;
+﻿using EventEnroll.Data;
+using EventEnroll.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System;
 using System.Collections.Generic;
@@ -11,20 +12,25 @@ namespace EventEnroll.Services.EventService
     {
         private static List<Event> events = new List<Event> {
             new Event(),
-            new Event{ Id = 1, Title = "Pedro's birthday", Date = DateTime.Now}
+            new Event{ EventId = 1, Title = "Pedro's birthday", Date = DateTime.Now}
         };
         private readonly IMapper _mapper;
-        public EventService(IMapper mapper)
+        private readonly DataContext _context;
+        public EventService(IMapper mapper, DataContext context)
         {
+            _context = context;
             _mapper = mapper;
         }
         public async Task<ServiceResponse<List<GetEventDto>>> AddEvent(AddEventDto newEvent)
         {
             var serviceResponse = new ServiceResponse<List<GetEventDto>>();
             var eventVar = _mapper.Map<Event>(newEvent);
-            eventVar.Id = events.Max(c => c.Id) + 1;
-            events.Add(_mapper.Map<Event>(newEvent));
-            serviceResponse.Data = events.Select(c => _mapper.Map<GetEventDto>(c)).ToList();
+
+            _context.Events.Add(eventVar);
+            await _context.SaveChangesAsync();
+
+            serviceResponse.Data = 
+                await _context.Events.Select(c => _mapper.Map<GetEventDto>(c)).ToListAsync();
             return serviceResponse;
         }
 
@@ -33,13 +39,15 @@ namespace EventEnroll.Services.EventService
             var serviceResponse = new ServiceResponse<List<GetEventDto>>();
             try
             {
-                var eventVar = events.FirstOrDefault(c => c.Id == id);
+                var eventVar = await _context.Events.FirstOrDefaultAsync(c => c.EventId == id);
                 if (eventVar is null)
                     throw new Exception($"Event with Id '{id}' not found.");
 
-                events.Remove(eventVar);
+                _context.Events.Remove(eventVar);
 
-                serviceResponse.Data = events.Select(c => _mapper.Map<GetEventDto>(c)).ToList(); 
+                await _context.SaveChangesAsync();
+
+                serviceResponse.Data = await _context.Events.Select(c => _mapper.Map<GetEventDto>(c)).ToListAsync(); 
             }
             catch (Exception ex)
             {
@@ -53,14 +61,15 @@ namespace EventEnroll.Services.EventService
         public async Task<ServiceResponse<List<GetEventDto>>> GetAllEvents()
         {
             var serviceResponse = new ServiceResponse<List<GetEventDto>>();
-            serviceResponse.Data = events.Select(c => _mapper.Map<GetEventDto>(c)).ToList();
+            var dbEvents = await _context.Events.ToListAsync();
+            serviceResponse.Data = dbEvents.Select(c => _mapper.Map<GetEventDto>(c)).ToList();
             return serviceResponse;
         }
         public async Task<ServiceResponse<GetEventDto>> GetEventById(int id)
         {
             var serviceResponse = new ServiceResponse<GetEventDto>();
-            var eventVar = events.FirstOrDefault(c => c.Id == id);
-            serviceResponse.Data = _mapper.Map<GetEventDto>(eventVar);
+            var dbEvent = await _context.Events.FirstOrDefaultAsync(c => c.EventId == id);
+            serviceResponse.Data = _mapper.Map<GetEventDto>(dbEvent);
             return serviceResponse;
         }
 
@@ -70,18 +79,20 @@ namespace EventEnroll.Services.EventService
             var serviceResponse = new ServiceResponse<GetEventDto>();
             try
             {
-                var eventVar = events.FirstOrDefault(c => c.Id == updatedEvent.Id);
+                var eventVar = await _context.Events.FirstOrDefaultAsync(c => c.EventId == updatedEvent.EventId);
                 if (eventVar is null)
-                    throw new Exception($"Event with Id '{updatedEvent.Id}' not found.");
+                    throw new Exception($"Event with Id '{updatedEvent.EventId}' not found.");
 
                 _mapper.Map(updatedEvent, eventVar);
 
                 eventVar.Title = updatedEvent.Title;
                 eventVar.Description = updatedEvent.Description;
                 eventVar.Date = updatedEvent.Date;
-                eventVar.Planner = updatedEvent.Planner;
-                eventVar.Participants = updatedEvent.Participants;
+                eventVar.Attendees = updatedEvent.Attendees;
+                eventVar.CreatorId = updatedEvent.CreatorId;
+                eventVar.Creator = updatedEvent.Creator;
 
+                await _context.SaveChangesAsync();
                 serviceResponse.Data = _mapper.Map<GetEventDto>(eventVar);
             }
             catch (Exception ex)
