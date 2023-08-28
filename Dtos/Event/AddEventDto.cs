@@ -10,6 +10,7 @@ namespace EventEnroll.Dtos.Event
 
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
         public DateTime Date { get; set; }
         [JsonIgnore]
         public string? CreatorId { get; set; }

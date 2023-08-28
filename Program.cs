@@ -11,11 +11,18 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using EventEnroll.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
+});
 //
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>

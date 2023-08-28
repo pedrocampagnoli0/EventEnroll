@@ -49,7 +49,7 @@ namespace EventEnroll.Controllers
             {
                 return NotFound(response);
             }
-            return Ok();
+            return Ok(response);
         }
         [HttpDelete("{id}")]
         public async Task<ActionResult<ServiceResponse<GetEventDto>>> DeleteEvent(int id)

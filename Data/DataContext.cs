@@ -16,19 +16,19 @@ namespace EventEnroll.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            //makes attendee table without primary key
+
+            //modelBuilder.Entity<Event>()
+            //        .HasMany(e => e.Attendees)
+            //        .WithMany(u => u.Events);
 
             modelBuilder.Entity<Event>()
-                    .HasMany(e => e.Attendees)
-                    .WithMany(u => u.Events);
+            .HasMany(e => e.Attendees) // Event has many attendees (users)
+            .WithMany() // Users can attend many events
+            .UsingEntity(j => j.ToTable("EventAttendees")); // Configure the junction table name
 
-            modelBuilder.Entity<Event>()
-                .HasOne(e => e.Creator)
-                .WithMany(c => c.CreatedEvents)
-                .HasForeignKey(e => e.CreatorId)
-                .OnDelete(DeleteBehavior.Restrict);
         }
         public DbSet<Event> Events => Set<Event>();
-        public DbSet<ApplicationUser> ApplicationUsers => Set<ApplicationUser>();
 
     }
 }

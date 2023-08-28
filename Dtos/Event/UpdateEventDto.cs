@@ -9,8 +9,7 @@ namespace EventEnroll.Dtos.Event
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public DateTime Date { get; set; }
-        public string? CreatorId { get; set; }
-        public ApplicationUser? Creator { get; set; }
-        public ICollection<ApplicationUser>? Attendees { get; set; } = new List<ApplicationUser>();
+        public string? CreatorName { get; set; }
+        public List<string>? Attendees { get; set; } = new List<string>();
     }
 }

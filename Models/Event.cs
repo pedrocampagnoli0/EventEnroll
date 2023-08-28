@@ -20,12 +20,12 @@ namespace EventEnroll.Models
         public string Description { get; set; } = string.Empty;
 
         [Required]
-        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
+        [DisplayFormat(DataFormatString = "{dd/MM/yyyy}")]
         public DateTime Date { get; set; }
         public string? CreatorId { get; set; }
         [ForeignKey("CreatorId")]
-        public ApplicationUser? Creator { get; set; }
+        public IdentityUser? Creator { get; set; }
         // Navigation properties
-        public ICollection<ApplicationUser>? Attendees { get; set; } = new List<ApplicationUser>();
+        public ICollection<IdentityUser>? Attendees { get; set; } = new List<IdentityUser>();
     }
 }

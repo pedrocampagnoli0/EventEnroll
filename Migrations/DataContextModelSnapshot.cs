@@ -22,21 +22,6 @@ namespace EventEnroll.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("ApplicationUserEvent", b =>
-                {
-                    b.Property<string>("AttendeesId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("EventsEventId")
-                        .HasColumnType("int");
-
-                    b.HasKey("AttendeesId", "EventsEventId");
-
-                    b.HasIndex("EventsEventId");
-
-                    b.ToTable("ApplicationUserEvent");
-                });
-
             modelBuilder.Entity("EventEnroll.Models.Event", b =>
                 {
                     b.Property<int>("EventId")
@@ -46,7 +31,6 @@ namespace EventEnroll.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventId"));
 
                     b.Property<string>("CreatorId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("Date")
@@ -66,6 +50,21 @@ namespace EventEnroll.Migrations
                     b.HasIndex("CreatorId");
 
                     b.ToTable("Events");
+                });
+
+            modelBuilder.Entity("EventIdentityUser", b =>
+                {
+                    b.Property<string>("AttendeesId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AttendeesId", "EventId");
+
+                    b.HasIndex("EventId");
+
+                    b.ToTable("EventAttendees", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -132,10 +131,6 @@ namespace EventEnroll.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -187,10 +182,6 @@ namespace EventEnroll.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityUser");
-
-                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -274,16 +265,18 @@ namespace EventEnroll.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("EventEnroll.Models.ApplicationUser", b =>
+            modelBuilder.Entity("EventEnroll.Models.Event", b =>
                 {
-                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatorId");
 
-                    b.HasDiscriminator().HasValue("ApplicationUser");
+                    b.Navigation("Creator");
                 });
 
-            modelBuilder.Entity("ApplicationUserEvent", b =>
+            modelBuilder.Entity("EventIdentityUser", b =>
                 {
-                    b.HasOne("EventEnroll.Models.ApplicationUser", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("AttendeesId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -291,20 +284,9 @@ namespace EventEnroll.Migrations
 
                     b.HasOne("EventEnroll.Models.Event", null)
                         .WithMany()
-                        .HasForeignKey("EventsEventId")
+                        .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("EventEnroll.Models.Event", b =>
-                {
-                    b.HasOne("EventEnroll.Models.ApplicationUser", "Creator")
-                        .WithMany("CreatedEvents")
-                        .HasForeignKey("CreatorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Creator");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -356,11 +338,6 @@ namespace EventEnroll.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("EventEnroll.Models.ApplicationUser", b =>
-                {
-                    b.Navigation("CreatedEvents");
                 });
 #pragma warning restore 612, 618
         }
