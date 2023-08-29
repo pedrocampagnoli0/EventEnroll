@@ -6,8 +6,8 @@ This is a .NET REST API with the basic CRUD for the Event class
 - AutoMapper for mapping the objects
 
 # Requisites
-.NET version 7.0 or superior
-SQL Server Express
+- .NET version 7.0 or superior
+- SQL Server Express
 
 # Installation
 ```bash
