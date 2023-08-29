@@ -1,4 +1,4 @@
-#About
+# About
 This is a .NET REST API with the basic CRUD for the Event class
 - Identity Framework, for managing the users
 - Entity for the database management
