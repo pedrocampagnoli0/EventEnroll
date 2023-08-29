@@ -83,25 +83,6 @@ Response Format (JSON):
   "message": ""
 }
 ```
-# AuthRepository
-Interacts with the database for authentication.
-
-Login(username, password)
-
-- Verifies credentials and generates a JWT authentication token.
-- Response Format:
-```csharp
-ServiceResponse<string> // Contains the generated JWT token
-```
-Register(user)
-- Creates a new user in the database.
-- Response Format:
-```csharp
-ServiceResponse<string> // Contains the ID of the newly created user
-```
-UserExists(username)
-- Checks if a user with the given username already exists.
-- Response Format: bool
 
 # EventController
 Handles the management of events, including creation, retrieval, updating, and deletion.
