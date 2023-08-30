@@ -1,5 +1,5 @@
 # About
-This is a .NET REST API with the basic CRUD for the Event class
+This is a .NET REST API with the CRUD operations for the Event class
 - Identity Framework, for managing the users
 - Entity for the database management
 - JWT for the authentication
